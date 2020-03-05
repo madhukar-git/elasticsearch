@@ -35,6 +35,7 @@ import java.net.URL;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.FileSystemException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -305,7 +306,12 @@ public class Environment {
     }
 
     public static FileStore getFileStore(final Path path) throws IOException {
-        return new ESFileStore(Files.getFileStore(path));
+        try {
+            return new ESFileStore(Files.getFileStore(path));
+        } catch (FileSystemException ex) {
+            //A workaround for RAMDISK file system
+            return new ESDummyFileStore(null);
+        }
     }
 
     /**
